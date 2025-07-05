@@ -75,7 +75,7 @@ const Dashboard = () => {
       setTotalRevenue(newAmount);
       toast({
         title: "Success!",
-        description: "Revenue increased by €1",
+        description: "Revenue increased by $1",
       });
     } catch (error) {
       console.error('Error updating revenue:', error);
@@ -111,7 +111,7 @@ const Dashboard = () => {
               <DollarSign className="h-4 w-4 text-slate-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">€{totalRevenue.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-slate-900">${totalRevenue.toLocaleString()}</div>
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center text-xs text-green-600">
                   <TrendingUp className="h-3 w-3 mr-1" />
@@ -124,7 +124,7 @@ const Dashboard = () => {
                   className="bg-green-600 hover:bg-green-700 text-white"
                 >
                   <Plus className="h-3 w-3 mr-1" />
-                  +€1
+                  +$1
                 </Button>
               </div>
             </CardContent>
@@ -150,7 +150,7 @@ const Dashboard = () => {
               <ShoppingCart className="h-4 w-4 text-slate-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">€12,234</div>
+              <div className="text-2xl font-bold text-slate-900">$12,234</div>
               <div className="flex items-center text-xs text-red-600 mt-1">
                 <TrendingDown className="h-3 w-3 mr-1" />
                 -19% from last month
@@ -194,7 +194,7 @@ const Dashboard = () => {
                       borderRadius: '8px',
                       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
-                    formatter={(value) => [`€${value}`, 'Sales']}
+                    formatter={(value) => [`$${value}`, 'Sales']}
                   />
                   <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -221,7 +221,7 @@ const Dashboard = () => {
                       borderRadius: '8px',
                       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
-                    formatter={(value) => [`€${value}`, 'Revenue']}
+                    formatter={(value) => [`$${value}`, 'Revenue']}
                   />
                   <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }} />
                 </LineChart>
@@ -279,7 +279,7 @@ const Dashboard = () => {
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-slate-600">Monthly Revenue</span>
-                    <span className="font-medium text-slate-900">€{totalRevenue.toLocaleString()} / €50,000</span>
+                    <span className="font-medium text-slate-900">${totalRevenue.toLocaleString()} / $50,000</span>
                   </div>
                   <Progress value={Math.min((totalRevenue / 50000) * 100, 100)} className="h-2" />
                 </div>
@@ -293,7 +293,7 @@ const Dashboard = () => {
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-slate-600">Product Sales</span>
-                    <span className="font-medium text-slate-900">€12,234 / €15,000</span>
+                    <span className="font-medium text-slate-900">$12,234 / $15,000</span>
                   </div>
                   <Progress value={68} className="h-2" />
                 </div>
