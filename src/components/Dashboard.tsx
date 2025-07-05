@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, TrendingDown, Users, ShoppingCart, DollarSign, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Users, ShoppingCart, DollarSign, Activity, Plus } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 const Dashboard = () => {
+  const [totalRevenue, setTotalRevenue] = useState(45231);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
   const salesData = [
     { name: 'Jan', value: 4000 },
     { name: 'Feb', value: 3000 },
@@ -20,6 +27,67 @@ const Dashboard = () => {
     { name: 'Mobile', value: 300, color: '#82ca9d' },
     { name: 'Tablet', value: 200, color: '#ffc658' },
   ];
+
+  // Fetch current revenue from Supabase
+  useEffect(() => {
+    fetchRevenue();
+  }, []);
+
+  const fetchRevenue = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('revenue')
+        .select('total_amount')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) throw error;
+      
+      if (data) {
+        setTotalRevenue(Number(data.total_amount));
+      }
+    } catch (error) {
+      console.error('Error fetching revenue:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch revenue data",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const incrementRevenue = async () => {
+    setIsLoading(true);
+    try {
+      const newAmount = totalRevenue + 1;
+      
+      const { error } = await supabase
+        .from('revenue')
+        .update({ 
+          total_amount: newAmount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', (await supabase.from('revenue').select('id').single()).data?.id);
+
+      if (error) throw error;
+
+      setTotalRevenue(newAmount);
+      toast({
+        title: "Success!",
+        description: "Revenue increased by €1",
+      });
+    } catch (error) {
+      console.error('Error updating revenue:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update revenue",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
@@ -43,10 +111,21 @@ const Dashboard = () => {
               <DollarSign className="h-4 w-4 text-slate-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">€45,231</div>
-              <div className="flex items-center text-xs text-green-600 mt-1">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                +20.1% from last month
+              <div className="text-2xl font-bold text-slate-900">€{totalRevenue.toLocaleString()}</div>
+              <div className="flex items-center justify-between mt-3">
+                <div className="flex items-center text-xs text-green-600">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  +20.1% from last month
+                </div>
+                <Button 
+                  size="sm" 
+                  onClick={incrementRevenue}
+                  disabled={isLoading}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  +€1
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -200,9 +279,9 @@ const Dashboard = () => {
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-slate-600">Monthly Revenue</span>
-                    <span className="font-medium text-slate-900">€45,231 / €50,000</span>
+                    <span className="font-medium text-slate-900">€{totalRevenue.toLocaleString()} / €50,000</span>
                   </div>
-                  <Progress value={90} className="h-2" />
+                  <Progress value={Math.min((totalRevenue / 50000) * 100, 100)} className="h-2" />
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
